@@ -1,24 +1,12 @@
-<?php 
+<?php
 
-class database{
-    private static $instance = null;
-     
-    public static function getConnection(){
-        if(self::$instance === null) {
-            try {
-                $host = 'localhost';
-                $db = 'duan1';
-                $usename = 'root';
-                $password = '';
+$host = 'localhost';
+$dbname = 'duan1';
+$user = 'root';
+$pass = '';
 
-                self::$instance = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $usename, $password);
-
-                self::$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            } catch(PDOException $e) {
-                die("Kết nối thất bại: " . $e->getMessage());
-            }
-        }
-
-        return self::$instance;
-    }
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+} catch (PDOException $e) {
+    die("Kết nối thất bại: " . $e->getMessage());
 }
