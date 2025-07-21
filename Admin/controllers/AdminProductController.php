@@ -5,8 +5,8 @@ require_once 'models/AdminCategory.php';
 
 class AdminProductController
 {
-    public $modelProduct;
-    public $modelCategory;
+    private $modelProduct;
+    private $modelCategory;
     public function __construct()
     {
         $this->modelProduct = new AdminProduct();
@@ -20,7 +20,7 @@ class AdminProductController
 
     public function formadd()
     {
-        $listCategory = $this->modelCategory->getAllCategory();
+        $categories = $this->modelCategory->getAllCategory();
         require_once './views/admin/products/add.php';
     }
 
@@ -80,7 +80,7 @@ class AdminProductController
             $updated_at = date('Y-m-d H:i:s');
 
             // Gọi model để lưu vào database
-            $result = $this->modelProduct->insertProduct($name, $price, $price_sale, $quantity, $image, $created_at, $updated_at, $category_id);
+            $result = $this->modelProduct->addProduct($name, $price, $price_sale, $quantity, $image, $created_at, $updated_at, $category_id);
             if (!empty($errors)) {
                 $listCategory = $this->modelCategory->getAllCategory();
                 $error = implode('<br>', $errors);
@@ -136,9 +136,7 @@ class AdminProductController
 
             $result = $this->modelProduct->updateProduct($id, $name, $price, $price_sale, $quantity, $image, $updated_at, $category_id, $description);
             if ($result) {
-                echo '<script>alert("Cập nhật sản phẩm thành công!");
-                
-                </script>';
+                echo '<script>alert("Cập nhật sản phẩm thành công!");</script>';
                 header('Location: ' . BASE_URL_ADMIN . '?act=products');
                 exit();
             } else {

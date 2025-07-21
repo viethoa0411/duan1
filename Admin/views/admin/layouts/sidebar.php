@@ -6,7 +6,7 @@
                         <a href="<?=BASE_URL_ADMIN?>" class="nav-link text-white">Dashboard</a>
                     </li>
                     <li>
-                        <a href="#" class="nav-link text-white">Quản lý danh mục</a>
+                        <a href="<?=BASE_URL_ADMIN . '?act=categories'?> " class="nav-link text-white">Quản lý danh mục</a>
                     </li>
                     <li>
                         <a href="<?=BASE_URL_ADMIN . '?act=products'?>" class="nav-link text-white">Quản lý sản phẩm</a>

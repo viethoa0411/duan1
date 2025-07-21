@@ -39,9 +39,9 @@
                     <label for="category_id">Danh mục:</label>
                     <select name="category_id" id="category_id" required>
                         <option value="">-- Chọn danh mục --</option>
-                        <?php if (!empty($listCategory)) foreach ($listCategory as $cat): ?>
-                            <option value="<?= htmlspecialchars($cat['id']) ?>">
-                                <?= htmlspecialchars($cat['name']) ?>
+                        <?php if (!empty($categories)) foreach ($categories as $category): ?>
+                            <option value="<?= htmlspecialchars($category['id']) ?>">
+                                <?= htmlspecialchars($category['name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

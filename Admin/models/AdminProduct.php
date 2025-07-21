@@ -2,7 +2,7 @@
 
 class AdminProduct
 {
-    public $conn;
+    private $conn;
 
     public function __construct()
     {
@@ -26,7 +26,7 @@ class AdminProduct
         }
     }
 
-    public function insertProduct($name, $price, $price_sale, $quantity, $image, $created_at, $updated_at, $category_id)
+    public function addProduct($name, $price, $price_sale, $quantity, $image, $created_at, $updated_at, $category_id)
     {
         try {
             $quantity = (int)$quantity;
