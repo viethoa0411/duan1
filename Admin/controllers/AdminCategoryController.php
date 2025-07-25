@@ -12,7 +12,8 @@ class AdminCategoryController
 
     public function list()
     {
-        $categories = $this->modelCategory->getAllCategory();
+          $keyword = $_GET['keyword'] ?? '';
+        $categories = $this->modelCategory->getAllCategory($keyword);
         require_once './views/admin/categories/list.php';
     }
 
@@ -25,7 +26,9 @@ class AdminCategoryController
     {
         $name = $_POST['name'];
         $description = $_POST['description'];
-        $this->modelCategory->addCategory($name, $description);
+        $created_at = date('Y-m-d H:i:s');
+        $updated_at = date('Y-m-d H:i:s');
+        $this->modelCategory->addCategory($name, $description, $created_at, $updated_at);
         header('Location: ' . BASE_URL_ADMIN . '?act=categories');
     }
 
@@ -41,7 +44,9 @@ class AdminCategoryController
             $id = $_POST['id'];
             $name = trim($_POST['name']);
             $description = trim($_POST['description']);
-            $result = $this->modelCategory->updateCategory($id, $name, $description);
+            $created_at = date('Y-m-d H:i:s');
+            $updated_at = date('Y-m-d H:i:s');
+            $result = $this->modelCategory->updateCategory($id, $name, $description,$created_at, $updated_at);
             if ($result) {
                 echo '<script>alert("Cập nhật danh mục thành công!");</script>';
                 header('Location: ' . BASE_URL_ADMIN . '?act=categories');

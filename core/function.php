@@ -21,3 +21,12 @@ function connectDB() {
         echo ("Connection failed: " . $e->getMessage());
     }
 }
+
+function checkLoginadmin(){
+    if (!isset($_SESSION['user_admin'])) {
+        require_once './views/admin/auth/login.php';
+        exit();
+    }
+}
+
+

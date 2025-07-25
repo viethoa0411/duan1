@@ -9,29 +9,45 @@ class AdminProduct
         $this->conn = connectDB();
     }
 
-    public function getAllProduct()
-    {
-        try {
-            // $sql = "SELECT * FROM products";
-            $sql = "SELECT products.*, categories.name AS category_name
-                    FROM products
-                    LEFT JOIN categories ON products.category_id = categories.id
-                    ORDER BY products.updated_at DESC";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute();
-            return $stmt->fetchAll();
-        } catch (Exception $e) {
-            echo "Lỗi truy vấn bị sai: " . $e->getMessage();
-            return false;
-        }
-    }
+public function getAllProduct($keyword = '')
+{
+    try {
+        $sql = "SELECT products.*, categories.name AS category_name
+                FROM products
+                LEFT JOIN categories ON products.category_id = categories.id
+                WHERE 1"; // thêm WHERE để dễ nối thêm điều kiện
 
-    public function addProduct($name, $price, $price_sale, $quantity, $image, $created_at, $updated_at, $category_id)
+        if (!empty($keyword)) {
+            $sql .= " AND (products.name LIKE :keyword OR categories.name LIKE :keyword)";
+        }
+
+        if (!empty($category_id)) {
+            $sql .= " AND products.category_id = :category_id";
+        }
+
+        $sql .= " ORDER BY products.updated_at DESC";
+
+        $stmt = $this->conn->prepare($sql);
+
+        if (!empty($keyword)) {
+            $stmt->bindValue(':keyword', '%' . $keyword . '%');
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch (Exception $e) {
+        echo "Lỗi truy vấn: " . $e->getMessage();
+        return false;
+    }
+}
+
+
+    public function addProduct($name, $price, $price_sale, $quantity, $image, $created_at, $updated_at, $category_id,$description)
     {
         try {
             $quantity = (int)$quantity;
-            $sql = 'INSERT INTO `products` (`name`, `price`, `price_sale`, `quantity`, `image`, `created_at`, `updated_at`, `category_id`) 
-                    VALUES (:name, :price, :price_sale, :quantity, :image, :created_at, :updated_at, :category_id)';
+            $sql = 'INSERT INTO `products` (`name`, `price`, `price_sale`, `quantity`, `image`, `created_at`, `updated_at`, `category_id`,`description`) 
+                    VALUES (:name, :price, :price_sale, :quantity, :image, :created_at, :updated_at, :category_id, :description)';
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 ':name' => $name,
@@ -41,7 +57,8 @@ class AdminProduct
                 ':image' => $image,
                 ':created_at' => $created_at,
                 ':updated_at' => $updated_at,
-                ':category_id' => $category_id
+                ':category_id' => $category_id,
+                ':description' => $description
             ]);
             return $this->conn->lastInsertId();
         } catch (Exception $e) {
@@ -63,7 +80,8 @@ class AdminProduct
         }
     }
 
-        public function updateProduct($id, $name, $price, $price_sale, $quantity, $image, $updated_at, $category_id, $description) {
+    public function updateProduct($id, $name, $price, $price_sale, $quantity, $image, $updated_at, $category_id, $description)
+    {
         try {
             $sql = "UPDATE products SET 
                         name = :name,
