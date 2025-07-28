@@ -1,7 +1,7 @@
 <?php 
 
 require_once './core/database.php';
-require_once './core/env.php';
+require_once './core/function.php';
 
 
 // rquire mọi controllers

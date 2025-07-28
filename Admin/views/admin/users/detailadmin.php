@@ -7,16 +7,12 @@
 
         <main class="content">
             <div class="col py-3">
-                <h2>Chi tiết người dùng</h2>
+                <h2>Chi tiết quản trị viên</h2>
 
                 <?php if (!empty($user)): ?>
                     <table class="table table-bordered">
                         <tr>
-                            <th>ID</th>
-                            <td><?= htmlspecialchars($user['id']) ?></td>
-                        </tr>
-                        <tr>
-                            <th>Tên người dùng</th>
+                            <th>Tên quản trị</th>
                             <td><?= htmlspecialchars($user['name']) ?></td>
                         </tr>
                         <tr>
@@ -48,7 +44,7 @@
                     <div class="alert alert-warning">Không tìm thấy người dùng.</div>
                 <?php endif; ?>
 
-                <a href="<?= BASE_URL_ADMIN . '?act=users' ?>" class="btn btn-secondary mt-3">Quay lại danh sách</a>
+                <a href="<?= BASE_URL_ADMIN . '?act=accounts' ?>" class="btn btn-secondary mt-3">Quay lại danh sách</a>
             </div>
         </main>
     </div>

@@ -80,9 +80,36 @@ public function getAllCategory($keyword = '')
         }
     }
 
-    public function delete($id)
-    {
-        $stmt = $this->conn->prepare("DELETE FROM categories WHERE id = ?");
-        return $stmt->execute([$id]);
+    public function hasProducts($category_id) {
+    $sql = "SELECT COUNT(*) FROM products WHERE category_id = ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute([$category_id]);
+    return $stmt->fetchColumn() > 0;
+}
+
+public function deleteCategory($category_id) {
+        try {
+            // 1. Cập nhật sản phẩm thuộc danh mục về NULL
+            $sqlUpdate = "UPDATE products SET category_id = NULL WHERE category_id = :category_id";
+            $stmtUpdate = $this->conn->prepare($sqlUpdate);
+            $stmtUpdate->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+            $stmtUpdate->execute();
+
+            // 2. Xóa danh mục
+            $sqlDelete = "DELETE FROM categories WHERE id = :category_id";
+            $stmtDelete = $this->conn->prepare($sqlDelete);
+            $stmtDelete->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+            $stmtDelete->execute();
+
+            return [
+                'status' => true,
+                'message' => 'Xóa danh mục thành công, các sản phẩm đã bị bỏ liên kết danh mục!'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => false,
+                'message' => 'Lỗi khi xóa danh mục: ' . $e->getMessage()
+            ];
+        }
     }
 }

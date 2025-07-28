@@ -9,12 +9,11 @@
 
         <!-- Main content -->
             <div class="col py-3">
-                <h2>Danh sách người dùng</h2>
+                <h2>Danh sách khách hàng</h2>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Tên người dùng </th>
+                            <th>Tên khách hàng</th>
                             <th>Email</th>
                             <th>Số điện thoại</th>
                             <th>Hành động</th>
@@ -25,11 +24,10 @@
                             <?php if (!empty($users)): ?>
                                 <?php foreach ($users as $user): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($user['id']) ?></td>
                                         <td><?= htmlspecialchars($user['name']) ?></td>
                                         <td><?= htmlspecialchars($user['email']) ?></td>
                                         <td><?= htmlspecialchars($user['phone'])?></td>
-                                        <td><a href="<?=BASE_URL_ADMIN . '?act=users/detail&id=' . $user['id']?>"  class="btn btn-primary btn-sm">Xem</a></td>
+                                        <td><a href="<?= BASE_URL_ADMIN . '?act=users/detail&id=' . $user['id']?>"  class="btn btn-primary btn-sm">Xem</a></td>
 
                                     </tr>
                                 <?php endforeach; ?>

@@ -52,8 +52,17 @@ match ($act) {
     'categories/delete'=>(new AdminCategoryController()) ->delete($id = $_GET['id']),
 
     // route cho user
-    'users' => (new AdminUserController()) -> list(),
-    'users/detail' => (new AdminUserController()) -> detail($id = $_GET['id']),
+    //route admin
+    'accounts' => (new AdminUserController()) -> listadmin(),
+    'accounts/detail' => (new AdminUserController()) -> detailadmin($id = $_GET['id']),
+    'accounts/toggleStatus' => (new AdminUserController()) -> toggleStatus($_GET['id']),
+    'accounts/add' => (new AdminUserController()) -> formAddAdmin(),
+    'add/admin' => (new AdminUserController()) -> addAdmin(),
+
+    //route khách hàng
+    'users' => (new AdminUserController()) -> listuser(),
+    'users/detail' => (new AdminUserController()) -> detailuser($id = $_GET['id']),
+
 
 
     // route cho auth
@@ -64,5 +73,7 @@ match ($act) {
 
     // route cho order
     'orders' => (new AdminOrderController()) -> list(),
+    'orders/detail' => (new AdminOrderController()) -> detail($id = $_GET['id']),
+    'orders/update' =>  (new AdminOrderController()) -> updateStatus(),
 };
 

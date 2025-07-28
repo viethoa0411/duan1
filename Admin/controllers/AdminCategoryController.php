@@ -1,5 +1,4 @@
 <?php
-
 class AdminCategoryController
 {
 
@@ -12,7 +11,7 @@ class AdminCategoryController
 
     public function list()
     {
-          $keyword = $_GET['keyword'] ?? '';
+        $keyword = $_GET['keyword'] ?? '';
         $categories = $this->modelCategory->getAllCategory($keyword);
         require_once './views/admin/categories/list.php';
     }
@@ -60,16 +59,19 @@ class AdminCategoryController
     }
 
 
-        public function delete($id) {
-        $result = $this->modelCategory->delete($id);
-        if ($result) {
-            echo '<script>alert("Xóa sản phẩm thành công!");</script>';
-            header('Location: ' . BASE_URL_ADMIN . '?act=categories');
-            exit();
-        } else {
-            echo '<script>alert("Có lỗi khi xóa sản phẩm!");</script>';
-            header('Location: ' . BASE_URL_ADMIN . '?act=categories');
-            exit();
-        }
+public function delete($id) {
+    $categoryModel = new AdminCategory();
+    $result = $categoryModel->deleteCategory($id);
+
+    if ($result['status']) {
+        $_SESSION['success'] = $result['message'];
+    } else {
+        $_SESSION['error'] = $result['message'];
     }
+
+    header("Location: " . BASE_URL_ADMIN . "?act=categories");
+    exit;
+}
+
+
 }

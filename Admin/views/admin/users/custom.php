@@ -1,1 +1,0 @@
-<h1> danh sách khánh hàng</h1>

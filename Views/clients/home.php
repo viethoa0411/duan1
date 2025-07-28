@@ -20,9 +20,9 @@
                 <li class="has-submenu">
                 <a href="#">Sản phẩm ▼</a>
                 <ul class="submenu">
-                    <li><a href="#">Laptop</a></li>
-                    <li><a href="#">Điện thoại</a></li>
-                    <li><a href="#">Phụ kiện</a></li>
+                    <li><a href="#"></a></li>
+                    <li><a href="#"></a></li>
+                    <li><a href="#"></a></li>
                 </ul>
                 </li>
                 <li>
