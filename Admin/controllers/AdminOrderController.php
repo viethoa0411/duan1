@@ -4,16 +4,17 @@ require_once 'models/AdminOrder.php';
 
 class AdminOrderController
 {
-    private $Order;
+    private $order;
     public function __construct()
     {
-        $this->Order = new AdminOrder();
+        $this->order = new AdminOrder();
     }
+
+    
     public function list()
     {
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : null;
-        $orders = $this->Order->getAllOrders($keyword);
-
+        $orders = $this->order->getAllOrders($keyword);
         require_once './views/admin/orders/list.php';
     }
 
@@ -22,9 +23,9 @@ class AdminOrderController
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
         if ($id > 0) {
-            $orders = $this->Order->getOrderById($id);
-            $orderItems = $this->Order->getOrderItems($id);
-            $liststatus = $this->Order->getAllStatus();
+            $orders = $this->order->getOrderById($id);
+            $orderItems = $this->order->getOrderItems($id);
+            $liststatus = $this->order->getAllStatus();
             require_once './views/admin/orders/detail.php';
         } else {
             echo "ID đơn hàng không hợp lệ.";

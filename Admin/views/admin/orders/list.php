@@ -34,7 +34,7 @@
                         <td><?= htmlspecialchars($order['order_code']) ?></td>
                         <td><?= htmlspecialchars($order['consignee']) ?></td>
                         <td><?= htmlspecialchars($order['phone']) ?></td>
-                        <td><?= htmlspecialchars($order['total_amount']) ?></td>
+                        <td><?= htmlspecialchars($order['total_amount']) ?>đ</td>
                         <td><?= htmlspecialchars($order['address']) ?></td>
                         <td><?= htmlspecialchars($order['order_date']) ?></td>
                         <td><?= htmlspecialchars($order['status_name']) ?></td>

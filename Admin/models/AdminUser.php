@@ -12,6 +12,14 @@ class AdminUser
         $this->conn = connectDB();
     }
 
+    public function getTotalUsers() {
+        $sql = "SELECT COUNT(*) AS total FROM users";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
+
 
     public function getAllAccounts($role_id)
     {
@@ -148,28 +156,39 @@ public function addadmin($name, $email, $password, $phone, $address, $created_at
     }
 
 
-    public function checklogin($email, $password)
-    {
-        try {
-            $sql = "SELECT * FROM users WHERE email = :email";
-            $stmt = $this->conn->prepare($sql);
-            $stmt->execute([':email' => $email]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+public function checklogin($email, $password)
+{
+    try {
+        $sql = "SELECT * FROM users WHERE email = :email LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':email' => $email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($user && password_verify($password, $user['password'])) {
-                if ($user['role_id'] == 1) {
-                    if ($user['status'] == 1) {
-                        return $user['email'];
-                    } else {
-                        return "Tài khoản này đã bị mất quyền quản trị !!";
-                    }
-                }
-            } else {
-                return "Email hoặc mật khẩu không đúng !!";
-            }
-        } catch (\Exception $e) {
-            echo "Lỗi truy vấn bị sai" . $e->getMessage();
-            return false;
+        // Kiểm tra email hoặc mật khẩu
+        if (!$user || !password_verify($password, $user['password'])) {
+            return "Email hoặc mật khẩu không đúng !!";
         }
+
+        // Kiểm tra quyền quản trị
+        if ($user['role_id'] != 1) {
+            return "Bạn không có quyền quản trị !!";
+        }
+
+        // Kiểm tra trạng thái tài khoản
+        if ($user['status'] != 1) {
+            return "Tài khoản này không còn quyền quản trị !!";
+        }
+
+        // Nếu thỏa cả 2 điều kiện thì đăng nhập thành công
+        return $email; // Trả về thông tin user để lưu session
+
+    } catch (\Exception $e) {
+        error_log("Lỗi đăng nhập: " . $e->getMessage());
+        return "Đã xảy ra lỗi trong quá trình đăng nhập!";
     }
+}
+
+
+
+    
 }

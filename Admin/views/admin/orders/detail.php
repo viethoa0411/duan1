@@ -19,7 +19,7 @@
                 <h2 class="mb-0">Chi tiết đơn hàng #<?= htmlspecialchars($orders['order_code']) ?></h2>
 
                 <form action="<?= BASE_URL_ADMIN . '?act=orders/update' ?>" method="post" class="d-flex align-items-center"
-                 onsubmit="return confirm('Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng này không?');">
+                    onsubmit="return confirm('Bạn có chắc chắn muốn cập nhật trạng thái đơn hàng này không?');">
                     <input type="hidden" name="order_id" value="<?= htmlspecialchars($orders['id']) ?>">
 
                     <select name="status_id" class="form-select form-select-sm me-2" style="width: 200px;">
@@ -57,37 +57,72 @@
             }
             ?>
 
-            <div class="card mb-4">
-                <div class="card-header text-white alert alert-<?= $colorAlerts; ?>" role="alert">
-                    <h5 class="mb-0">Thông tin người nhận</h5>
+            <div class="row">
+                <!-- Thông tin người đặt hàng -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Thông tin người đặt hàng</h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <span class="fw-bold">Họ tên:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['user_name'] ?? '') ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Email:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['user_email'] ?? '') ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Điện thoại:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['user_phone'] ?? '') ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Ngày đặt:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['order_date']) ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Ghi chú:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['note']) ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Trạng thái:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['status_name']) ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Phương thức thanh toán:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['payment_method_name']) ?></span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <span class="fw-bold">Họ tên:</span>
-                        <span class="text-muted"><?= htmlspecialchars($orders['consignee']) ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="fw-bold">Điện thoại:</span>
-                        <span class="text-muted"><?= htmlspecialchars($orders['phone']) ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="fw-bold">Địa chỉ:</span>
-                        <span class="text-muted"><?= htmlspecialchars($orders['address']) ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="fw-bold">Ngày đặt:</span>
-                        <span class="text-muted"><?= htmlspecialchars($orders['order_date']) ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="fw-bold">Ghi chú:</span>
-                        <span class="text-muted"><?= htmlspecialchars($orders['note']) ?></span>
-                    </li>
-                    <li class="list-group-item">
-                        <span class="fw-bold">Phương thức thanh toán:</span>
-                        <span class="text-muted"><?= htmlspecialchars($orders['payment_method_name']) ?></span>
-                    </li>
-                </ul>
+
+                <!-- Thông tin người nhận -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header text-white alert alert-<?= $colorAlerts; ?>" role="alert">
+                            <h5 class="mb-0">Thông tin người nhận</h5>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <span class="fw-bold">Họ tên:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['consignee']) ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Điện thoại:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['phone']) ?></span>
+                            </li>
+                            <li class="list-group-item">
+                                <span class="fw-bold">Địa chỉ:</span>
+                                <span class="text-muted"><?= htmlspecialchars($orders['address']) ?></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+
+
+
 
 
             <h5>Sản phẩm đã đặt</h5>

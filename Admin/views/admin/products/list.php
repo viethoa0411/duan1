@@ -17,7 +17,6 @@
                         <th>Tên sản phẩm</th>
                         <th>Danh mục</th>
                         <th>Giá</th>
-                        <th>Giá giảm</th>
                         <th>Số lượng</th>
                         <th>Ảnh</th>
                         <th>Hành động</th>
@@ -29,8 +28,7 @@
                         <td><?= htmlspecialchars($product['id']) ?></td>
                         <td><?= htmlspecialchars($product['name']) ?></td>
                         <td><?= htmlspecialchars($product['category_name'] ?? 'Chưa có danh mục') ?></td>
-                        <td><?= htmlspecialchars($product['price']) ?></td>
-                        <td><?= htmlspecialchars($product['price_sale']) ?></td>
+                        <td><?= htmlspecialchars($product['price']) ?>đ</td>
                         <td><?= htmlspecialchars($product['quantity']) ?></td>
 
                         <td>
@@ -42,11 +40,7 @@
                             <?php endif; ?>
                         </td>
                         <td>
-
-                        <!-- <a href="<?//=BASE_URL_ADMIN . '?act=products/detail&id=' . $product['id']?>"  class="btn btn-primary btn-sm">Xem</a> -->
-                        
-                                <a href="<?= BASE_URL_ADMIN . '?act=products/detail&id=' . $product['id'] ?>" class="btn btn-primary btn-sm">Xem</a>
-
+                            <a href="<?= BASE_URL_ADMIN . '?act=products/detail&id=' . $product['id'] ?>" class="btn btn-primary btn-sm">Xem</a>
                             <a href="<?=BASE_URL_ADMIN . '?act=products/edit&id=' . $product['id']?>" class="btn btn-warning btn-sm">Sửa</a>
                             <a href="<?=BASE_URL_ADMIN . '?act=products/delete&id=' .$product['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">Xóa</a>
                         </td>

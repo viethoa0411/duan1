@@ -65,7 +65,7 @@
                                         </tr>
                                         <tr>
                                             <th>Danh mục:</th>
-                                            <td><?= htmlspecialchars($product['category_name']) ?></td>
+                                            <td><?= htmlspecialchars($product['category_name'] ?? 'Chưa có danh mục') ?></td>
                                             <?//php var_dump($category_name) ;
                                             //   die(); ?>
                                             
@@ -73,10 +73,6 @@
                                         <tr>
                                             <th>Giá:</th>
                                             <td><strong class="text-danger"><?= number_format($product['price']) ?> đ</strong></td>
-                                        </tr>
-                                        <tr>
-                                            <th>Giá giảm:</th>
-                                            <td><strong class="text-success"><?= number_format($product['price_sale']) ?> đ</strong></td>
                                         </tr>
                                         <tr>
                                             <th>Số lượng:</th>

@@ -48,16 +48,13 @@ class AdminProductController
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
             $name = trim($_POST['name'] ?? '');
             $price = floatval($_POST['price'] ?? 0);
-            $price_sale = floatval($_POST['price_sale'] ?? 0);
             $quantity = intval($_POST['quantity'] ?? 0);
             $category_id = intval($_POST['category_id'] ?? 0);
             $description = trim($_POST['description'] ?? '');
-    
             $errors = [];
     
             if (empty($name)) $errors[] = "Tên sản phẩm không được để trống!";
             if ($price <= 0) $errors[] = "Giá sản phẩm phải lớn hơn 0!";
-            if ($price_sale > $price) $errors[] = "Giá khuyến mãi không được lớn hơn giá gốc!";
             if ($quantity < 0) $errors[] = "Số lượng không được âm!";
             if ($category_id <= 0) $errors[] = "Vui lòng chọn danh mục!";
     
@@ -121,7 +118,6 @@ class AdminProductController
             $result = $this->Product->addProduct(
                 $name,
                 $price,
-                $price_sale,
                 $quantity,
                 $description,
                 $image,
@@ -157,7 +153,6 @@ class AdminProductController
             $id = $_POST['id'];
             $name = trim($_POST['name'] ?? '');
             $price = floatval($_POST['price'] ?? 0);
-            $price_sale = floatval($_POST['price_sale'] ?? 0);
             $quantity = intval($_POST['quantity'] ?? 0);
             $category_id = intval($_POST['category_id'] ?? 0);
             $description = trim($_POST['description'] ?? '');
@@ -167,7 +162,6 @@ class AdminProductController
     
             if (empty($name)) $errors[] = "Tên sản phẩm không được để trống!";
             if ($price <= 0) $errors[] = "Giá sản phẩm phải lớn hơn 0!";
-            if ($price_sale > $price) $errors[] = "Giá khuyến mãi không được lớn hơn giá gốc!";
             if ($quantity < 0) $errors[] = "Số lượng không được âm!";
             if ($category_id <= 0) $errors[] = "Vui lòng chọn danh mục!";
     
@@ -232,7 +226,6 @@ class AdminProductController
                 $id,
                 $name,
                 $price,
-                $price_sale,
                 $quantity,
                 $image,
                 $imageListJson,

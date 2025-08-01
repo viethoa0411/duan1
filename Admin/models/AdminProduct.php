@@ -8,6 +8,16 @@ class AdminProduct
     {
         $this->conn = connectDB();
     }
+    
+
+    public function getTotalProducts()
+    {
+        $sql = "SELECT COUNT(*) AS total FROM products";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'];
+    }
 
     public function getAllProduct()
     {
@@ -25,20 +35,19 @@ class AdminProduct
         }
     }
 
-    public function addProduct($name, $price, $price_sale, $quantity, $description, $image, $image_list, $created_at, $updated_at, $category_id)
+    public function addProduct($name, $price, $quantity, $description, $image, $image_list, $created_at, $updated_at, $category_id)
     {
         try {
             $quantity = (int)$quantity;
             $sql = 'INSERT INTO `products` 
-                    (`name`, `price`, `price_sale`, `quantity`, `description`, `image`, `image_list`, `created_at`, `updated_at`, `category_id`) 
+                    (`name`, `price`, `quantity`, `description`, `image`, `image_list`, `created_at`, `updated_at`, `category_id`) 
                     VALUES 
-                    (:name, :price, :price_sale, :quantity, :description, :image, :image_list, :created_at, :updated_at, :category_id)';
+                    (:name, :price, :quantity, :description, :image, :image_list, :created_at, :updated_at, :category_id)';
 
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 ':name' => $name,
                 ':price' => $price,
-                ':price_sale' => $price_sale,
                 ':quantity' => $quantity,
                 ':description' => $description,
                 ':image' => $image,
@@ -70,13 +79,12 @@ class AdminProduct
         }
     }
 
-    public function updateProduct($id, $name, $price, $price_sale, $quantity, $image, $image_list, $updated_at, $category_id, $description)
+    public function updateProduct($id, $name, $price, $quantity, $image, $image_list, $updated_at, $category_id, $description)
     {
         try {
             $sql = "UPDATE products SET 
                         name = :name,
                         price = :price,
-                        price_sale = :price_sale,
                         quantity = :quantity,
                         description = :description,
                         image = :image,
@@ -89,7 +97,6 @@ class AdminProduct
                 ':id' => $id,
                 ':name' => $name,
                 ':price' => $price,
-                ':price_sale' => $price_sale,
                 ':quantity' => $quantity,
                 ':description' => $description,
                 ':image' => $image,

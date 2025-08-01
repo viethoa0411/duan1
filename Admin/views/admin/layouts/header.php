@@ -19,6 +19,7 @@
       display: flex;
       flex: 1;
       min-height: calc(100vh - 56px - 50px); /* trừ header và footer */
+      padding: 0;
     }
 
     .sidebar {
@@ -30,7 +31,7 @@
 
     .sidebar a {
       color: #fff;
-      padding: 12px 20px;
+      padding: 12px 30px;
       display: block;
       text-decoration: none;
     }
@@ -48,18 +49,27 @@
 
     .footer {
       height: 50px;
-      background-color: #343a40;
+      background-color:rgba(var(--bs-dark-rgb));
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 0;
+
+    }
+    .container-fluid {
+      padding: 0;
     }
 
+    .navbar-brand{
+      padding-left: 20px;
+    }
     @media (max-width: 768px) {
       .sidebar {
         display: none;
       }
     }
+
   </style>
 </head>
 <body>
@@ -74,9 +84,6 @@
             <i class="bi bi-person-circle"></i> Admin
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#">Hồ sơ</a></li>
-            <li><a class="dropdown-item" href="#">Đổi mật khẩu</a></li>
-            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" onclick="return confirm('Đăng xuất khỏi hệ thống!!');" href="<?=BASE_URL_ADMIN . '?act=logout'?>">Đăng xuất</a></li>
           </ul>
         </div>
