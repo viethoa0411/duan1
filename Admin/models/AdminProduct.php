@@ -35,19 +35,20 @@ class AdminProduct
         }
     }
 
-    public function addProduct($name, $price, $quantity, $description, $image, $image_list, $created_at, $updated_at, $category_id)
+    public function addProduct($name, $price, $price_sale, $quantity, $description, $image, $image_list, $created_at, $updated_at, $category_id)
     {
         try {
             $quantity = (int)$quantity;
             $sql = 'INSERT INTO `products` 
-                    (`name`, `price`, `quantity`, `description`, `image`, `image_list`, `created_at`, `updated_at`, `category_id`) 
+                    (`name`, `price`, `price_sale`, `quantity`, `description`, `image`, `image_list`, `created_at`, `updated_at`, `category_id`) 
                     VALUES 
-                    (:name, :price, :quantity, :description, :image, :image_list, :created_at, :updated_at, :category_id)';
+                    (:name, :price, :price_sale, :quantity, :description, :image, :image_list, :created_at, :updated_at, :category_id)';
 
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([
                 ':name' => $name,
                 ':price' => $price,
+                ':price_sale' => $price_sale,
                 ':quantity' => $quantity,
                 ':description' => $description,
                 ':image' => $image,

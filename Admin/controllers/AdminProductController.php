@@ -3,7 +3,7 @@
 require_once 'models/AdminProduct.php';
 require_once 'models/AdminCategory.php';
 require_once 'models/AdminReview.php';
-require_once 'models/AdminProductImage.php'; 
+require_once 'models/AdminProductImage.php';
 
 class AdminProductController
 {
@@ -48,24 +48,26 @@ class AdminProductController
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
             $name = trim($_POST['name'] ?? '');
             $price = floatval($_POST['price'] ?? 0);
+            $price_sale = floatval($_POST['price_sale'] ?? 0);
             $quantity = intval($_POST['quantity'] ?? 0);
             $category_id = intval($_POST['category_id'] ?? 0);
             $description = trim($_POST['description'] ?? '');
             $errors = [];
-    
+
             if (empty($name)) $errors[] = "Tên sản phẩm không được để trống!";
             if ($price <= 0) $errors[] = "Giá sản phẩm phải lớn hơn 0!";
+            if ($price_sale > $price) $errors[] = "Giá khuyến mãi không được lớn hơn giá gốc!";
             if ($quantity < 0) $errors[] = "Số lượng không được âm!";
             if ($category_id <= 0) $errors[] = "Vui lòng chọn danh mục!";
-    
+
             // Khởi tạo biến ảnh chính và ảnh phụ
             $image = '';
             $imageListPaths = [];
-    
+
             // Thư mục upload
             $upload_dir = 'uploads/products/';
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    
+
             // Xử lý ảnh phụ trước
             if (!empty($_FILES['image_list']) && is_array($_FILES['image_list']['name'])) {
                 $imageCount = count($_FILES['image_list']['name']);
@@ -77,7 +79,7 @@ class AdminProductController
                             $file_ext = pathinfo($_FILES['image_list']['name'][$key], PATHINFO_EXTENSION);
                             $file_name = uniqid() . '.' . $file_ext;
                             $target_path = $upload_dir . $file_name;
-    
+
                             if (move_uploaded_file($tmpName, $target_path)) {
                                 $imageListPaths[] = $target_path;
                             }
@@ -85,23 +87,23 @@ class AdminProductController
                     }
                 }
             }
-    
+
             // Xử lý ảnh chính
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
                 $file_name = uniqid() . '.' . $file_extension;
                 $upload_path = $upload_dir . $file_name;
-    
+
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
                     $image = $upload_path;
                 }
             }
-    
+
             // Nếu không có ảnh chính, dùng ảnh phụ đầu tiên làm ảnh chính
             if (empty($image) && !empty($imageListPaths)) {
                 $image = $imageListPaths[0];
             }
-    
+
             // Nếu có lỗi, thông báo và quay lại form
             if (!empty($errors)) {
                 foreach ($errors as $error) {
@@ -110,14 +112,15 @@ class AdminProductController
                 $this->formadd(); // Gọi lại form nếu có lỗi
                 return;
             }
-    
+
             $created_at = date('Y-m-d H:i:s');
             $updated_at = $created_at;
-    
+
             // Gọi model để thêm sản phẩm
             $result = $this->Product->addProduct(
                 $name,
                 $price,
+                $price_sale,
                 $quantity,
                 $description,
                 $image,
@@ -126,7 +129,7 @@ class AdminProductController
                 $updated_at,
                 $category_id
             );
-    
+
             if ($result) {
                 echo '<script>alert("Thêm sản phẩm thành công!");</script>';
                 header('Location: ' . BASE_URL_ADMIN . '?act=products');
@@ -138,7 +141,7 @@ class AdminProductController
             $this->formadd(); // Hiển thị form nếu chưa submit
         }
     }
-    
+
 
     public function editProduct($id)
     {
@@ -157,20 +160,20 @@ class AdminProductController
             $category_id = intval($_POST['category_id'] ?? 0);
             $description = trim($_POST['description'] ?? '');
             $updated_at = date('Y-m-d H:i:s');
-    
+
             $errors = [];
-    
+
             if (empty($name)) $errors[] = "Tên sản phẩm không được để trống!";
             if ($price <= 0) $errors[] = "Giá sản phẩm phải lớn hơn 0!";
             if ($quantity < 0) $errors[] = "Số lượng không được âm!";
             if ($category_id <= 0) $errors[] = "Vui lòng chọn danh mục!";
-    
+
             $upload_dir = 'uploads/products/';
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-    
+
             // Ảnh phụ mới
             $imageListPaths = [];
-    
+
             if (!empty($_FILES['image_list']) && is_array($_FILES['image_list']['name'])) {
                 $imageCount = count($_FILES['image_list']['name']);
                 if ($imageCount > 10) {
@@ -181,7 +184,7 @@ class AdminProductController
                             $file_ext = pathinfo($_FILES['image_list']['name'][$key], PATHINFO_EXTENSION);
                             $file_name = uniqid() . '.' . $file_ext;
                             $target_path = $upload_dir . $file_name;
-    
+
                             if (move_uploaded_file($tmpName, $target_path)) {
                                 $imageListPaths[] = $target_path;
                             }
@@ -189,24 +192,24 @@ class AdminProductController
                     }
                 }
             }
-    
+
             // Ảnh chính
             $image = $_POST['old_image'] ?? '';
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
                 $file_name = uniqid() . '.' . $file_extension;
                 $upload_path = $upload_dir . $file_name;
-    
+
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
                     $image = $upload_path;
                 }
             }
-    
+
             // Nếu không có ảnh chính mới → dùng ảnh phụ đầu tiên nếu có
             if (empty($image) && !empty($imageListPaths)) {
                 $image = $imageListPaths[0];
             }
-    
+
             if (!empty($errors)) {
                 foreach ($errors as $error) {
                     echo "<script>alert('$error');</script>";
@@ -216,12 +219,12 @@ class AdminProductController
                 require './views/admin/products/edit.php';
                 return;
             }
-    
+
             // Nếu không upload ảnh phụ mới → giữ nguyên ảnh phụ cũ
             $productOld = $this->Product->getProductById($id);
-            
+
             $imageListJson = !empty($imageListPaths) ? json_encode($imageListPaths) : $productOld['image_list'];
-    
+
             $result = $this->Product->updateProduct(
                 $id,
                 $name,
@@ -233,7 +236,7 @@ class AdminProductController
                 $category_id,
                 $description
             );
-    
+
             if ($result) {
                 echo '<script>alert("Cập nhật sản phẩm thành công!");</script>';
                 header('Location: ' . BASE_URL_ADMIN . '?act=products');
@@ -246,7 +249,7 @@ class AdminProductController
             }
         }
     }
-    
+
 
     public function uploadImages()
     {

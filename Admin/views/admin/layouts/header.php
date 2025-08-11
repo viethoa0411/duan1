@@ -75,18 +75,22 @@
 <body>
 
   <!-- Header -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">AdminPanel</a>
-      <div class="ms-auto">
-        <div class="dropdown">
-          <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-            <i class="bi bi-person-circle"></i> Admin
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" onclick="return confirm('Đăng xuất khỏi hệ thống!!');" href="<?=BASE_URL_ADMIN . '?act=logout'?>">Đăng xuất</a></li>
-          </ul>
-        </div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">AdminPanel</a>
+    <div class="ms-auto">
+      <div class="dropdown">
+        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle"></i> <?= htmlspecialchars($_SESSION['user_admin']['name'] ?? 'Admin') ?>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li>
+            <a class="dropdown-item" onclick="return confirm('Đăng xuất khỏi hệ thống!!');" href="<?= BASE_URL_ADMIN . '?act=logout' ?>">
+              Đăng xuất
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>

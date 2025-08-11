@@ -14,4 +14,15 @@ class Category {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // Lấy danh mục con có tên chứa từ khóa
+    public function getCategoriesByKeyword($keyword) {
+        $query = "SELECT * FROM categories WHERE name LIKE :keyword";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute(['keyword' => "%$keyword%"]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+   
+
+
 }

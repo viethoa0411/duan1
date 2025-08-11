@@ -5,8 +5,6 @@
         <!-- Sidebar -->
         <?php include './views/admin/layouts/sidebar.php'; ?>
 
-        <main class="content">
-
             <!-- Main content -->
             <div class="col p-0">
                 <!-- Tiêu đề -->
@@ -114,8 +112,6 @@
                     }
                 }
             </script>
-
-        </main>
     </div>
 </div>
 

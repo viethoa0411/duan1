@@ -28,6 +28,7 @@ if($act !== 'login' && $act !== 'checklogin' && $act !== 'logout') {
     checkLoginadmin();
 }
 
+
 match ($act) {
     
     '/' => (new AdminController()) ->index(),
