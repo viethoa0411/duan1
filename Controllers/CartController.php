@@ -17,21 +17,45 @@ class CartController
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $userId = $_SESSION['user_client']['id'];
-            $productId = $_POST['product_id'] ?? null;
-            $variantId = $_POST['variant_id'] ?? null;
-            $quantity = $_POST['quantity'] ?? 1;
+            $userId = (int) $_SESSION['user_client']['id'];
+            $productId = (int) ($_POST['product_id'] ?? 0);
+            $variantId = (int) ($_POST['variant_id'] ?? 0);
+            $quantity = (int) ($_POST['quantity'] ?? 1);
 
             if ($productId && $variantId && $quantity > 0) {
-                $this->cartModel->add((int)$userId, (int)$productId, (int)$variantId, (int)$quantity);
+                // Lấy thông tin tồn kho từ bảng product_variants
+                $variantData = $this->cartModel->getVariantStock($variantId);
+
+                if (!$variantData) {
+                    echo "<script>alert('Biến thể sản phẩm không tồn tại!');history.back();</script>";
+                    exit;
+                }
+
+                $stock = (int) $variantData['stock'];
+
+                // Lấy số lượng hiện có trong giỏ
+                $currentInCart = $this->cartModel->getQuantityInCart($userId, $variantId);
+
+                // Nếu giỏ đã đầy số lượng tồn
+                if ($currentInCart >= $stock) {
+                    echo "<script>alert('Sản phẩm này trong giỏ đã đạt số lượng tối đa trong kho!');history.back();</script>";
+                    exit;
+                }
+
+                // Nếu số lượng muốn thêm vượt quá tồn kho còn lại → báo lỗi
+                if ($currentInCart + $quantity > $stock) {
+                    echo "<script>alert('Bạn đang thêm quá số lượng sản phẩm có sẵn vào giỏ hàng');history.back();</script>";
+                    exit;
+                }
+
+                // Thêm vào giỏ nếu hợp lệ
+                $this->cartModel->add($userId, $productId, $variantId, $quantity);
                 $_SESSION['cart_count'] = $this->cartModel->getCartItemCount($userId);
                 header('Location: ' . BASE_URL . '?act=cart');
                 exit;
             }
         }
     }
-
-
     public function list()
     {
         if (!isset($_SESSION['user_client'])) {
@@ -101,5 +125,4 @@ class CartController
         header("Location: " . BASE_URL . "?act=cart");
         exit;
     }
-    
 }

@@ -25,32 +25,11 @@
           <img src="./uploads/logo2.png" alt="Logo" width="100" />
         </a>
 
-        <!-- Menu -->
-       <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 fw-semibold" style="font-size: 14px; margin-left: 30px;">
-            <!-- Danh mục Nữ và Nam hiển thị ngang nhau -->
-            <li class="nav-item">
-              <a class="nav-link text-dark" href="?act=category_female">Nữ</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-dark" href="?act=category_male">Nam</a>
-            </li>
-
-
-              <!-- VOUCHERS -->
-              <li class="nav-item">
-                <a href="#" class="nav-link px-2 link-body-emphasis">KHO VOUCHERS</a>
-              </li>
-
-              <!-- Mũi tên xuống rỗng nếu không dùng -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <!-- Bạn có thể thêm nội dung mũi tên xuống ở đây -->
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item fw-semibold" style="font-size: 13px;" href="#">Mục dropdown</a></li>
-                </ul>
-              </li>
-            </ul>
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0 fw-semibold" style="font-size: 14px">
+          <li><a href="<?= BASE_URL ?>" class="nav-link px-2 link-body-emphasis">TRANG CHỦ</a></li>
+          <li><a href="<?= BASE_URL . '?act=products' ?>" class="nav-link px-2 link-body-emphasis">SẢN PHẨM</a></li>
+          <li><a href="#" class="nav-link px-2 link-body-emphasis">KHO VOUCHERS</a></li>
+        </ul>
 
 
         <!-- Tài khoản + Giỏ hàng -->
@@ -76,13 +55,11 @@
               </a>
             </button>
           <?php endif; ?>
-
-          <a href="<?= BASE_URL . '?act=cart' ?>" class="text-dark text-decoration-none position-relative d-flex flex-column align-items-center">
-            <i class="bi bi-bag fs-6"></i>
+          <a href="<?= BASE_URL . '?act=cart' ?>" class="text-dark text-decoration-none me-4 position-relative d-flex flex-column align-items-center">
+            <i class="bi bi-bag fs-5"></i>
             <small style="font-size: 13px">Giỏ hàng</small>
           </a>
         </div>
-
       </div>
     </div>
   </header>

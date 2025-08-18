@@ -47,35 +47,46 @@ class Cart
         }
     }
 
-    public function clearCartByUserId($userId) {
+    public function clearCartByUserId($userId)
+    {
         $pdo = getDBConnection();
         $sql = "DELETE FROM carts WHERE user_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$userId]);
     }
+    public function countCartItemsByUserId($userId)
+    {
+        $sql = "SELECT COUNT(*) AS total FROM carts WHERE user_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int) $result['total'];
+    }
+
 
     public function getCartItemsByUserId($userId)
     {
         try {
             $sql = "
-                SELECT 
-                    c.id AS cart_id, 
-                    c.product_id,
-                    c.variant_id,
-                    c.quantity, 
-                    p.name AS product_name, 
-                    p.image AS product_image,
-                    p.price_sale,
-                    s.name AS size_name,
-                    co.name AS color_name,
-                    pv.stock
-                FROM carts c
-                JOIN products p ON c.product_id = p.id
-                JOIN product_variants pv ON c.variant_id = pv.id
-                JOIN sizes s ON pv.size_id = s.id
-                JOIN colors co ON pv.color_id = co.id
-                WHERE c.user_id = :userId
-            ";
+            SELECT 
+                c.id AS cart_id, 
+                c.product_id,
+                c.variant_id,
+                c.quantity, 
+                p.name AS product_name, 
+                p.image AS product_image,
+                p.price,
+                p.price_sale,
+                s.name AS size_name,
+                co.name AS color_name,
+                pv.stock
+            FROM carts c
+            JOIN products p ON c.product_id = p.id
+            JOIN product_variants pv ON c.variant_id = pv.id
+            JOIN sizes s ON pv.size_id = s.id
+            JOIN colors co ON pv.color_id = co.id
+            WHERE c.user_id = :userId
+        ";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([':userId' => $userId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -84,6 +95,7 @@ class Cart
             return [];
         }
     }
+
     public function updateQuantity($cartId, $newQuantity)
     {
         try {
@@ -108,16 +120,46 @@ class Cart
         }
     }
 
-    public function getCartItemCount($userId)
-{
-    try {
-        $sql = "SELECT COUNT(*) FROM carts WHERE user_id = :userId";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute([':userId' => $userId]);
-        return $stmt->fetchColumn();
-    } catch (PDOException $e) {
-        echo "Lỗi truy vấn số lượng giỏ hàng: " . $e->getMessage();
-        return 0;
+    // Models/Cart.php
+
+    public function getVariantStock($variantId)
+    {
+        $stmt = $this->conn->prepare("
+        SELECT id, stock 
+        FROM product_variants 
+        WHERE id = :variant_id
+    ");
+        $stmt->execute([':variant_id' => $variantId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-}
+
+    public function getQuantityInCart($userId, $variantId)
+    {
+        $stmt = $this->conn->prepare("
+        SELECT quantity 
+        FROM carts 
+        WHERE user_id = :user_id AND variant_id = :variant_id
+    ");
+        $stmt->execute([
+            ':user_id' => $userId,
+            ':variant_id' => $variantId
+        ]);
+        return (int) $stmt->fetchColumn();
+    }
+
+
+
+
+    public function getCartItemCount($userId)
+    {
+        try {
+            $sql = "SELECT COUNT(*) FROM carts WHERE user_id = :userId";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([':userId' => $userId]);
+            return $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            echo "Lỗi truy vấn số lượng giỏ hàng: " . $e->getMessage();
+            return 0;
+        }
+    }
 }

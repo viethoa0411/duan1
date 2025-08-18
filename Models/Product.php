@@ -5,17 +5,23 @@ class Product
 {
     private $conn;
 
-    public function __construct($conn) {
+    public function __construct($conn)
+    {
         $this->conn = $conn;
     }
 
-    function getAllProducts() {
-        $pdo = getDBConnection();
-        $stmt = $pdo->query("SELECT * FROM products");
+    public function getAllProducts()
+    {
+        $sql = "SELECT p.*, c.name as category_name 
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id";
+        $stmt = $this->conn->query($sql);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getProductById($id) {
+
+    public function getProductById($id)
+    {
         $pdo = getDBConnection();
         $sql = "
             SELECT p.*, c.name AS category_name 
@@ -28,8 +34,9 @@ class Product
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-      // Lấy sản phẩm theo id danh mục
-    public function getProductsByCategoryId($category_id) {
+    // Lấy sản phẩm theo id danh mục
+    public function getProductsByCategoryId($category_id)
+    {
         $query = "  SELECT p.*, c.name AS category_name 
                     FROM products p
                     JOIN categories c ON p.category_id = c.id
@@ -39,8 +46,9 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-     // Lấy sản phẩm theo nhiều id danh mục
-    public function getProductsByCategoryIds($category_ids) {
+    // Lấy sản phẩm theo nhiều id danh mục
+    public function getProductsByCategoryIds($category_ids)
+    {
         if (empty($category_ids)) {
             return [];
         }
@@ -51,7 +59,7 @@ class Product
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function searchProducts($keyword) 
+    public function searchProducts($keyword)
     {
         $pdo = getDBConnection();
         $sql = "
@@ -64,8 +72,9 @@ class Product
         $stmt->execute(['keyword' => '%' . $keyword . '%']);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    public function getRelatedProducts($category_id, $current_product_id, $limit = 4) {
+
+    public function getRelatedProducts($category_id, $current_product_id, $limit = 4)
+    {
         $pdo = getDBConnection();
         $limit = (int)$limit;
         $sql = "
@@ -78,21 +87,23 @@ class Product
         $stmt->execute([$category_id, $current_product_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    public function getNewProducts($limit = 8) {
+
+    public function getNewProducts($limit = 12)
+    {
         $pdo = getDBConnection();
         $limit = (int)$limit;
         $sql = "SELECT p.*, c.name AS category_name FROM products p
                 JOIN categories c ON p.category_id = c.id
                 ORDER BY p.created_at DESC
                 LIMIT $limit
-                "; 
+                ";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute(); 
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-   
-    public function getTopView($limit = 6) {
+
+    public function getTopView($limit = 8)
+    {
         $pdo = getDBConnection();
         $limit = (int)$limit;
         $sql = "SELECT p.*, c.name AS category_name FROM products p
@@ -102,8 +113,18 @@ class Product
                 ";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
+    public function searchProductsByName($keyword)
+    {
+        $sql = "SELECT p.*, c.name AS category_name 
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.name LIKE :keyword";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(['keyword' => '%' . $keyword . '%']);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
-?>

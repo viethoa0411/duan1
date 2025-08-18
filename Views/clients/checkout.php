@@ -36,22 +36,45 @@
         .sticky-top {
             top: 20px;
         }
+
+        .old-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+
+        .sale-price {
+            color: #dc3545;
+            font-weight: bold;
+        }
     </style>
 </head>
+<?php require_once './views/clients/layouts/header.php'; ?>
 
 <body>
     <?php
-    $shippingFee = 20000;
+    $shippingFee = 50000;
+    $discount = 0; // mặc định chưa có giảm giá
     $totalPrice = 0;
+
+    // Tính tổng tiền hàng
     foreach ($checkoutItems as $item) {
-        $subtotal = $item['price_sale'] * $item['quantity'];
+        $price_sale = $item['price_sale'] ?? 0;
+        $price      = $item['price'] ?? 0;
+        $finalPrice = ($price_sale > 0) ? $price_sale : $price;
+
+        $subtotal = $finalPrice * ($item['quantity'] ?? 1);
         $totalPrice += $subtotal;
     }
-    $finalTotalPrice = $totalPrice + $shippingFee;
+    $finalTotalPrice = $totalPrice + $shippingFee - $discount;
     ?>
+
+
     <div class="container my-5">
         <h1 class="text-center mb-4">Thanh toán</h1>
         <div class="row g-4">
+            <!-- Form thông tin khách hàng -->
             <div class="col-lg-7">
                 <form action="<?= BASE_URL ?>?act=place-order" method="POST">
                     <div class="card p-4">
@@ -68,7 +91,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="address" class="form-label">Địa chỉ</label>
-                            <input class="form-control" id="address" name="address" rows="3"
+                            <input class="form-control" id="address" name="address"
                                 value="<?= $_SESSION['user_client']['address'] ?? ''; ?>">
                         </div>
                         <div class="mb-3">
@@ -93,6 +116,7 @@
                         </div>
                     </div>
 
+                    <!-- Hidden fields -->
                     <input type="hidden" name="final_total_amount" value="<?= $finalTotalPrice; ?>">
                     <input type="hidden" name="shipping_fee" value="<?= $shippingFee; ?>">
                     <?php foreach ($checkoutItems as $item): ?>
@@ -102,6 +126,8 @@
                     <button class="btn btn-primary btn-lg mt-4 w-100" type="submit">Xác nhận đặt hàng</button>
                 </form>
             </div>
+
+            <!-- Tóm tắt đơn hàng -->
             <div class="col-lg-5">
                 <div class="card p-4 sticky-top">
                     <h3>Đơn hàng của bạn</h3>
@@ -109,15 +135,28 @@
                         <?php
                         $totalPrice = 0;
                         foreach ($checkoutItems as $item):
-                            $subtotal = $item['price_sale'] * $item['quantity'];
+                            $price_sale = $item['price_sale'] ?? 0;
+                            $price      = $item['price'] ?? 0;
+                            $finalPrice = ($price_sale > 0) ? $price_sale : $price;
+
+                            $subtotal = $finalPrice * ($item['quantity'] ?? 1);
                             $totalPrice += $subtotal;
                         ?>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <h6 class="my-0"><?= $item['product_name'] ?></h6>
-                                    <small class="text-muted">x<?= $item['quantity'] ?></small>
+                                    <h6 class="fw-bold mb-1"><?= htmlspecialchars($item['product_name']) ?></h6>
+                                    <div class="text-muted small">Size: <?= htmlspecialchars($item['size_name']) ?></div>
+                                    <div class="text-muted small">Màu sắc: <?= htmlspecialchars($item['color_name']) ?></div>
+                                    <div class="text-muted small">Số lượng: x<?= $item['quantity'] ?></div>
                                 </div>
-                                <span class="text-muted"><?= number_format($subtotal, 0, ',', '.') ?> VNĐ</span>
+                                <span class="fw-semibold text-primary">
+                                    <?php if ($price_sale > 0): ?>
+                                        <span class="old-price"><?= number_format($price, 0, ',', '.') ?>đ</span>
+                                        <span class="sale-price"><?= number_format($price_sale, 0, ',', '.') ?>đ</span>
+                                    <?php else: ?>
+                                        <?= number_format($price, 0, ',', '.') ?>đ
+                                    <?php endif; ?>
+                                </span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -128,27 +167,28 @@
                         </div>
                         <div class="d-flex justify-content-between">
                             <span>Phí vận chuyển</span>
-                            <span><?= number_format(20000, 0, ',', '.') ?> VNĐ</span>
+                            <span><?= number_format($shippingFee, 0, ',', '.') ?> VNĐ</span>
                         </div>
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Mã giảm giá/Voucher" aria-label="Mã giảm giá/Voucher">
-                            <button class="btn btn-outline-secondary" type="button" id="apply-voucher">Áp dụng</button>
-                        </div>
+                        <?php if ($discount > 0): ?>
+                            <div class="d-flex justify-content-between text-success">
+                                <span>Giảm giá</span>
+                                <span>-<?= number_format($discount, 0, ',', '.') ?> VNĐ</span>
+                            </div>
+                        <?php endif; ?>
                         <hr>
                         <div class="d-flex justify-content-between fw-bold">
                             <span>Tổng thanh toán</span>
-                            <span class="text-danger"><?= number_format($totalPrice + 20000, 0, ',', '.') ?> VNĐ</span>
+                            <span class="text-danger"><?= number_format($finalTotalPrice, 0, ',', '.') ?> VNĐ</span>
                         </div>
                     </div>
-                    <input type="hidden" name="final_total_amount" value="<?= $totalPrice + 20000 ?>">
                 </div>
             </div>
-            </form>
 
         </div>
     </div>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <?php require_once './views/clients/layouts/footer.php' ?>
 </body>
 
 </html>

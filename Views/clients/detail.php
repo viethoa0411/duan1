@@ -22,7 +22,7 @@
             <div class="p-3 bg-light border rounded shadow-sm mb-4" style="max-width: 700px; margin: 0 auto;">
                 <!-- Ảnh chính -->
                 <img id="mainImage"
-                    src="/duan1c/admin/uploads/products/<?= htmlspecialchars($imagePath) ?>"
+                    src="/duan1/admin/uploads/products/<?= htmlspecialchars($imagePath) ?>"
                     style="width: 100%; height: 450px; object-fit: cover;"
                     class="rounded img-fluid mb-3"
                     alt="Ảnh sản phẩm">
@@ -31,7 +31,7 @@
                 <?php if (!empty($imageList)): ?>
                     <div class="d-flex flex-wrap gap-2 justify-content-center">
                         <?php foreach ($imageList as $imgPath): ?>
-                            <img src="/duan1c/admin/<?= htmlspecialchars($imgPath) ?>"
+                            <img src="/duan1/admin/<?= htmlspecialchars($imgPath) ?>"
                                 class="img-thumbnail border"
                                 style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
                                 onclick="changeMainImage(this.src)">
@@ -73,9 +73,6 @@
                         </p>
                     <?php endif; ?>
                 </div>
-
-
-
 
                 <?php if (!empty($productVariants)): ?>
                     <div class="mb-4">
@@ -124,7 +121,7 @@
     </div>
     <!-- End Thông tin sản phẩm -->
 
-</div>
+
 
 <!--   Hiển thị bình luận -->
 <div class="card shadow-sm rounded-2 border-1 my-5">
@@ -167,13 +164,13 @@
     <div class="card-header bg-white border-bottom-0 text-center px-3 pt-3 pb-5">
 
         <div class="fs-4 fw-bold text-center pb-3 px-5" style="width: max-content;margin: 30px auto;border-bottom: 2px solid orangered;">
-            Sản phẩm cùng danh mục
+            Sản phẩm tương tự
         </div>
         <div class="row row-cols-1 row-cols-md-4 g-4">
             <?php foreach ($relatedProducts as $related): ?>
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0">
-                        <img src="/duan1c/admin/<?= htmlspecialchars($related['image']) ?>"
+                        <img src="/duan1/admin/<?= htmlspecialchars($related['image']) ?>"
                             class="card-img-top"
                             style="height: 300px; object-fit: cover;"
                             alt="<?= htmlspecialchars($related['name']) ?>">
@@ -280,7 +277,7 @@
                 );
 
                 if (selectedVariant) {
-                    stockInfo.textContent = `Tồn kho: ${selectedVariant.stock}`;
+                    stockInfo.textContent = `Có sẵn: ${selectedVariant.stock}`;
                     addToCartBtn.disabled = selectedVariant.stock <= 0;
                     selectedVariantId.value = selectedVariant.variant_id;
                     quantityInput.max = selectedVariant.stock;

@@ -12,6 +12,7 @@ class AdminProductController
     private $Review;
     private $ProductImage;
 
+
     public function __construct()
     {
         $this->Product = new AdminProduct();
@@ -22,9 +23,15 @@ class AdminProductController
 
     public function list()
     {
-        $products = $this->Product->getAllProduct();
+        // Lấy từ khóa tìm kiếm (nếu có)
+        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+
+        // Gọi hàm lấy sản phẩm kèm điều kiện tìm kiếm
+        $products = $this->Product->getAllProduct($keyword);
+
         require_once './views/admin/products/list.php';
     }
+
 
     public function detail($id)
     {
@@ -33,15 +40,27 @@ class AdminProductController
             echo "Không có sản phẩm này.";
             return;
         }
+
+        $sizes = $this->Product->getAllSizes();
+        $colors = $this->Product->getAllColors();
+        $variants = $this->Product->getVariantsByProductId($id);
+        $totalStock = $this->Product->getTotalStockByProductId($id);
         $reviews = $this->Review->getReviewsByProductId($id);
+
         require_once './views/admin/products/detail.php';
     }
+
+
 
     public function formadd()
     {
         $categories = $this->Category->getAllCategory();
+        $sizes = $this->Product->getAllSizes();   // Lấy danh sách size
+        $colors = $this->Product->getAllColors(); // Lấy danh sách màu
+
         require_once './views/admin/products/add.php';
     }
+
 
     public function addProduct()
     {
@@ -49,27 +68,24 @@ class AdminProductController
             $name = trim($_POST['name'] ?? '');
             $price = floatval($_POST['price'] ?? 0);
             $price_sale = floatval($_POST['price_sale'] ?? 0);
-            $quantity = intval($_POST['quantity'] ?? 0);
             $category_id = intval($_POST['category_id'] ?? 0);
             $description = trim($_POST['description'] ?? '');
             $errors = [];
 
+            // Validate cơ bản
             if (empty($name)) $errors[] = "Tên sản phẩm không được để trống!";
             if ($price <= 0) $errors[] = "Giá sản phẩm phải lớn hơn 0!";
             if ($price_sale > $price) $errors[] = "Giá khuyến mãi không được lớn hơn giá gốc!";
-            if ($quantity < 0) $errors[] = "Số lượng không được âm!";
             if ($category_id <= 0) $errors[] = "Vui lòng chọn danh mục!";
 
-            // Khởi tạo biến ảnh chính và ảnh phụ
+            // Xử lý upload ảnh
             $image = '';
             $imageListPaths = [];
-
-            // Thư mục upload
             $upload_dir = 'uploads/products/';
             if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
-            // Xử lý ảnh phụ trước
-            if (!empty($_FILES['image_list']) && is_array($_FILES['image_list']['name'])) {
+            // Ảnh phụ
+            if (!empty($_FILES['image_list']['name']) && is_array($_FILES['image_list']['name'])) {
                 $imageCount = count($_FILES['image_list']['name']);
                 if ($imageCount > 10) {
                     $errors[] = "Chỉ được chọn tối đa 10 ảnh phụ!";
@@ -79,7 +95,6 @@ class AdminProductController
                             $file_ext = pathinfo($_FILES['image_list']['name'][$key], PATHINFO_EXTENSION);
                             $file_name = uniqid() . '.' . $file_ext;
                             $target_path = $upload_dir . $file_name;
-
                             if (move_uploaded_file($tmpName, $target_path)) {
                                 $imageListPaths[] = $target_path;
                             }
@@ -88,40 +103,37 @@ class AdminProductController
                 }
             }
 
-            // Xử lý ảnh chính
+            // Ảnh chính
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
                 $file_name = uniqid() . '.' . $file_extension;
                 $upload_path = $upload_dir . $file_name;
-
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_path)) {
                     $image = $upload_path;
                 }
             }
 
-            // Nếu không có ảnh chính, dùng ảnh phụ đầu tiên làm ảnh chính
+            // Nếu không có ảnh chính thì dùng ảnh phụ đầu tiên
             if (empty($image) && !empty($imageListPaths)) {
                 $image = $imageListPaths[0];
             }
 
-            // Nếu có lỗi, thông báo và quay lại form
+            // Nếu có lỗi → quay lại form
             if (!empty($errors)) {
                 foreach ($errors as $error) {
                     echo "<script>alert('$error');</script>";
                 }
-                $this->formadd(); // Gọi lại form nếu có lỗi
+                $this->formadd();
                 return;
             }
 
             $created_at = date('Y-m-d H:i:s');
             $updated_at = $created_at;
 
-            // Gọi model để thêm sản phẩm
-            $result = $this->Product->addProduct(
+            $product_id = $this->Product->addProduct(
                 $name,
                 $price,
                 $price_sale,
-                $quantity,
                 $description,
                 $image,
                 json_encode($imageListPaths),
@@ -130,7 +142,7 @@ class AdminProductController
                 $category_id
             );
 
-            if ($result) {
+            if ($product_id) {
                 echo '<script>alert("Thêm sản phẩm thành công!");</script>';
                 header('Location: ' . BASE_URL_ADMIN . '?act=products');
                 exit();
@@ -138,9 +150,76 @@ class AdminProductController
                 echo '<script>alert("Có lỗi khi thêm sản phẩm!");</script>';
             }
         } else {
-            $this->formadd(); // Hiển thị form nếu chưa submit
+            $this->formadd();
         }
     }
+
+    public function formaddVariant($id = null)
+    {
+        // Nếu không truyền id hoặc id không hợp lệ => lấy từ GET
+        $id = $id ?? ($_GET['id'] ?? null);
+
+        if (!$id || !is_numeric($id)) {
+            echo "<script>alert('ID sản phẩm không hợp lệ!'); window.history.back();</script>";
+            return;
+        }
+
+        $products = $this->Product->getProductById($id);
+        if (!$products) {
+            echo "<script>alert('Sản phẩm không tồn tại!'); window.history.back();</script>";
+            return;
+        }
+
+        $sizes = $this->Product->getAllSizes();
+        $colors = $this->Product->getAllColors();
+        require_once './views/admin/products/variant.php';
+    }
+
+    public function addVariant()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_variant'])) {
+            // Lấy id từ POST (ưu tiên) hoặc GET
+            $id = $_POST['id'] ?? ($_GET['id'] ?? null);
+
+            if (!$id || !is_numeric($id)) {
+                echo "<script>alert('ID sản phẩm không hợp lệ!'); window.history.back();</script>";
+                return;
+            }
+
+            $sizes = $_POST['sizes'] ?? [];
+            $colors = $_POST['colors'] ?? [];
+            $variant_stock = $_POST['variant_stock'] ?? [];
+
+            if (empty($sizes) || empty($colors)) {
+                echo "<script>alert('Vui lòng chọn ít nhất một size và một màu!');</script>";
+                $this->formaddVariant($id);
+                return;
+            }
+
+            foreach ($sizes as $size) {
+                foreach ($colors as $color) {
+                    // Kiểm tra stock tồn tại và hợp lệ
+                    if (!isset($variant_stock[$size][$color]) || $variant_stock[$size][$color] < 0) {
+                        echo "<script>alert('Số lượng không hợp lệ cho size: $size, màu: $color');</script>";
+                        $this->formaddVariant($id);
+                        return;
+                    }
+
+                    $stock = (int)$variant_stock[$size][$color];
+                    $this->Product->addProductVariants($id, $size, $color, $stock);
+                }
+            }
+
+            echo "<script>alert('Thêm biến thể thành công!');</script>";
+            header('Location: ' . BASE_URL_ADMIN . '?act=products/detail&id=' . $id);
+            exit;
+        } else {
+            // Nếu không phải POST thì gọi form
+            $id = $_GET['id'] ?? null;
+            $this->formaddVariant($id);
+        }
+    }
+
 
 
     public function editProduct($id)
@@ -156,6 +235,14 @@ class AdminProductController
             $id = $_POST['id'];
             $name = trim($_POST['name'] ?? '');
             $price = floatval($_POST['price'] ?? 0);
+            $price_sale = floatval($_POST['price_sale'] ?? 0);
+            if ($price_sale > $price) {
+                $error = "Giá khuyến mãi không được lớn hơn giá gốc!";
+                $product = $this->Product->getProductById($id);
+                $listCategory = $this->Category->getAllCategory();
+                require './views/admin/products/edit.php';
+                return;
+            }
             $quantity = intval($_POST['quantity'] ?? 0);
             $category_id = intval($_POST['category_id'] ?? 0);
             $description = trim($_POST['description'] ?? '');
@@ -229,6 +316,7 @@ class AdminProductController
                 $id,
                 $name,
                 $price,
+                $price_sale,
                 $quantity,
                 $image,
                 $imageListJson,
@@ -298,18 +386,23 @@ class AdminProductController
             return;
         }
 
-        echo "✅ Tải ảnh thành công!";
+        echo "Tải ảnh thành công!";
     }
 
     public function deleteProduct($id)
     {
         $result = $this->Product->deleteProduct($id);
         if ($result) {
-            echo '<script>alert("Xóa sản phẩm thành công!");</script>';
+            echo '<script>
+        alert("Xóa sản phẩm thành công!");
+        window.location.href = "' . BASE_URL_ADMIN . '?act=products";
+    </script>';
         } else {
-            echo '<script>alert("Có lỗi khi xóa sản phẩm!");</script>';
+            echo '<script>
+        alert("Có lỗi khi xóa sản phẩm!");
+        window.location.href = "' . BASE_URL_ADMIN . '?act=products";
+    </script>';
         }
-        header('Location: ' . BASE_URL_ADMIN . '?act=products');
         exit();
     }
 }

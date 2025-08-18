@@ -44,12 +44,10 @@
                                 <label for="price" class="form-label fw-bold">Giá <span class="text-danger">*</span></label>
                                 <input type="number" name="price" id="price" class="form-control" value="<?= htmlspecialchars($product['price']) ?>" required>
                             </div>
-
                             <div class="col-md-4">
-                                <label for="quantity" class="form-label fw-bold">Số lượng <span class="text-danger">*</span></label>
-                                <input type="number" name="quantity" id="quantity" class="form-control" value="<?= htmlspecialchars($product['quantity']) ?>" required>
+                                <label for="price_sale" class="form-label fw-bold">Giá giảm (nếu có)</label>
+                                <input type="number" name="price_sale" id="price_sale" class="form-control" value="<?= htmlspecialchars($product['price_sale']) ?>">
                             </div>
-
                             <div class="col-md-12">
                                 <label for="description" class="form-label fw-bold">Mô tả <span class="text-danger">*</span></label>
                                 <textarea name="description" id="description" class="form-control" rows="2"><?= htmlspecialchars($product['description']) ?></textarea>

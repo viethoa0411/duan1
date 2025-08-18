@@ -53,12 +53,25 @@ class Order
         $stmt->execute([$orderId, $productId, $variantId, $quantity, $price]);
     }
 
+    // -stock trong bảng product_variants
     public function decreaseStock($variantId, $quantity)
     {
         $pdo = getDBConnection();
         $sql = "UPDATE product_variants SET stock = stock - ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$quantity, $variantId]);
+    }
+
+    // + lại khi hủy đơn
+    public function increaseStock($variant_id, $quantity)
+    {
+        $sql = "UPDATE product_variants 
+            SET stock = stock + :quantity 
+            WHERE id = :variant_id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+        $stmt->bindParam(':variant_id', $variant_id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 
     public function getOrder($user_id)
@@ -70,10 +83,7 @@ class Order
                 FROM orders 
                 JOIN status ON orders.status_id = status.id
                 WHERE orders.user_id = :user_id
-            order by order_date  DEsc 
-
-                ";
-
+            order by order_date  DEsc ";
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([':user_id' => $user_id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -82,8 +92,6 @@ class Order
             return false;
         }
     }
-
-
     public function getOrderById($id): array
     {
         $sql = "SELECT 
@@ -99,21 +107,28 @@ class Order
 
         return $stmt->fetch(PDO::FETCH_ASSOC); // Trả về 1 dòng
     }
-
     public function getOrderItems($orderId): array
     {
         $sql = "SELECT 
+                oi.variant_id,                  
                 p.name AS product_name,
-                oi.price,
-                oi.quantity,
+                p.image,
+                p.price AS original_price,
+                p.price_sale AS sale_price,
+                oi.price AS order_price,
+                oi.quantity, 
                 s.name AS size,
                 c.name AS color,
                 (oi.price * oi.quantity) AS total_price
             FROM order_item oi
-            JOIN products p ON oi.product_id = p.id
-            LEFT JOIN product_variants v ON oi.variant_id = v.id
-            LEFT JOIN sizes s ON v.size_id = s.id
-            LEFT JOIN colors c ON v.color_id = c.id
+            LEFT JOIN products p 
+                ON oi.product_id = p.id
+            LEFT JOIN product_variants v 
+                ON oi.variant_id = v.id
+            LEFT JOIN sizes s 
+                ON v.size_id  = s.id
+            LEFT JOIN colors c 
+                ON v.color_id = c.id
             WHERE oi.order_id = :order_id";
 
         $stmt = $this->conn->prepare($sql);
@@ -122,6 +137,8 @@ class Order
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
 
     public function updateOrderStatus($id, $status)
     {

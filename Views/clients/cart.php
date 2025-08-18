@@ -41,12 +41,24 @@
                     <?php
                     $totalPrice = 0;
                     foreach ($cartItems as $item):
-                        $subtotal = $item['price_sale'] * $item['quantity'];
+                        $price_sale = (int)($item['price_sale'] ?? 0);
+                        $price      = (int)($item['price'] ?? 0);
+
+                        // Nếu có giá sale > 0 thì dùng, ngược lại dùng giá gốc
+                        $finalPrice = ($price_sale > 0) ? $price_sale : $price;
+
+                        $subtotal   = $finalPrice * $item['quantity'];
                         $totalPrice += $subtotal;
                     ?>
                         <tr>
                             <td class="text-center">
-                                <input type="checkbox" class="product-checkbox" data-price="<?= $subtotal ?>" name="selected_products[]" value="<?= $item['cart_id'] ?>" form="checkout_form" checked>
+                                <input type="checkbox"
+                                    class="product-checkbox"
+                                    data-price="<?= $subtotal ?>"
+                                    name="selected_products[]"
+                                    value="<?= $item['cart_id'] ?>"
+                                    form="checkout_form"
+                                    checked>
                             </td>
                             <td>
                                 <?= $item['product_name']; ?>
@@ -54,24 +66,33 @@
                                 <small class="text-muted">Size: <?= $item['size_name']; ?>, Màu: <?= $item['color_name']; ?></small>
                             </td>
                             <td class="text-center">
-                                <?php
-                                $imageSrc = BASE_URL . 'admin/' . ltrim($item['product_image'], '/');
-                                ?>
-                                <img src="<?= $imageSrc; ?>" alt="<?= $item['product_name']; ?>" class="cart-item-image">
+                                <?php $imageSrc = BASE_URL . 'admin/' . ltrim($item['product_image'], '/'); ?>
+                                <img src="<?= $imageSrc; ?>"
+                                    alt="<?= $item['product_name']; ?>"
+                                    class="cart-item-image">
                             </td>
-                            <td class="text-end"><?= number_format($item['price_sale'], 0, ',', '.'); ?> VNĐ</td>
+                            <td class="text-end">
+                                <?php if ($price_sale > 0): ?>
+                                    <span class="text-danger fw-bold"><?= number_format($price_sale, 0, ',', '.'); ?> VNĐ</span>
+                                    <br>
+                                    <small class="text-muted text-decoration-line-through">
+                                        <?= number_format($price, 0, ',', '.'); ?> VNĐ
+                                    </small>
+                                <?php else: ?>
+                                    <span><?= number_format($price, 0, ',', '.'); ?> VNĐ</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="text-center">
-                                <form action="<?= BASE_URL ?>?act=update-cart" method="POST" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <form action="<?= BASE_URL ?>?act=update-cart" method="POST"
+                                    style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                     <input type="hidden" name="cart_id" value="<?= $item['cart_id']; ?>">
-                                    <input
-                                        type="number"
+                                    <input type="number"
                                         name="quantity"
                                         value="<?= $item['quantity']; ?>"
                                         min="1"
                                         max="<?= $item['stock']; ?>"
                                         style="width: 70px; padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-size: 14px;">
-                                    <button
-                                        type="submit"
+                                    <button type="submit"
                                         title="Cập nhật số lượng"
                                         style="background-color: #198754; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
                                         <i class="bi bi-arrow-clockwise"></i>
@@ -80,30 +101,32 @@
                             </td>
                             <td class="text-end"><?= number_format($subtotal, 0, ',', '.'); ?> VNĐ</td>
                             <td class="text-center">
-                                <a href="<?= BASE_URL ?>?act=remove-from-cart&cart_id=<?= $item['cart_id']; ?>" class="remove-button" title="Xóa sản phẩm">
+                                <a href="<?= BASE_URL ?>?act=remove-from-cart&cart_id=<?= $item['cart_id']; ?>"
+                                    class="remove-button"
+                                    title="Xóa sản phẩm">
                                     <i class="bi bi-trash-fill"></i>
                                 </a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
+
             </table>
 
             <div class="cart-summary-section">
                 <div class="cart-summary-box">
                     <div class="summary-row">
-                        <span class="summary-label">Tổng thanh toán:</span>
+                        <span class="summary-label">Tổng cộng</span>
                         <?php $finalTotalPrice = $totalPrice ?>
                         <span id="totalPrice" class="summary-total-price">
                             <?= number_format($finalTotalPrice, 0, ',', '.'); ?> VNĐ
                         </span>
-
                     </div>
                 </div>
             </div>
 
             <div class="cart-action-buttons">
-                <a href="<?= BASE_URL ?>index.php" class="btn-custom btn-continue-shopping">
+                <a href="<?= BASE_URL ?>" class="btn-custom btn-continue-shopping">
                     <i class="bi bi-arrow-left me-2"></i>Tiếp tục mua sắm
                 </a>
                 <form id="checkout_form" action="<?= BASE_URL ?>?act=cart-to-checkout" method="POST" style="flex-grow: 1;">

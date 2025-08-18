@@ -12,12 +12,14 @@ require_once './models/Variant.php';
 require_once './models/Auth.php';
 require_once './models/Cart.php';
 require_once './models/Order.php';
+require_once './Models/Category.php';
 
 // Controllers
 require_once './controllers/ClientController.php';
 require_once './controllers/AuthController.php';
 require_once './controllers/CartController.php';
 require_once './controllers/OrderController.php';
+require_once './Controllers/CategoryController.php';
 
 // Lấy hành động từ URL
 $act = $_GET['act'] ?? '/';
@@ -43,10 +45,7 @@ $routes = match ($act) {
     '/'                  => (new ClientController())->index(),
     'detail'             => (new ClientController())->detail($_GET['id'] ?? null),
     'search'             => (new ClientController())->search(),
-
-
-    'category_female'   => (new CategoryController($db))->showFemaleCategories(),
-    'category_male'     => (new CategoryController($db))->showMaleCategories(),
+    'products'          => (new ClientController())->listProducts(),
 
     // Auth
     'register'           => (new AuthController())->register(),
@@ -58,12 +57,12 @@ $routes = match ($act) {
     // Đơn hàng
     'history'            => (new OrderController())->history(),
     'remote-order'      => (new OrderController())->removeOrder($_GET['id']),
+    'refund-order'       => (new OrderController())->refundOrder($_GET['id']),
 
     // Giỏ hàng
     'cart'               => (new CartController())->list(),
     'cart_add'           => (new CartController())->add(),
     'update-cart'      => (new CartController())->update(),
-
     'remove-from-cart'   => (new CartController())->remove(),
 
     // Thanh toán

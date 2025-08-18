@@ -37,6 +37,8 @@ match ($act) {
     'products' =>(new AdminProductController()) ->list(),
     'formaddproduct'=>(new AdminProductController()) ->formadd(),
     'add/products'=>(new AdminProductController()) ->addProduct(),
+    'add/variant'=>(new AdminProductController()) ->formaddVariant($id = $_GET['id']),
+    'variant/add'=>(new AdminProductController()) ->addVariant(),
     'products/detail'=>(new AdminProductController()) ->detail($id = $_GET['id']),
     'products/edit'=>(new AdminProductController()) ->editProduct($id = $_GET['id']),
     'products/update'=>(new AdminProductController()) ->updateProduct(),
@@ -76,5 +78,7 @@ match ($act) {
     'orders' => (new AdminOrderController()) -> list(),
     'orders/detail' => (new AdminOrderController()) -> detail($id = $_GET['id']),
     'orders/update' =>  (new AdminOrderController()) -> updateStatus(),
+
+    
 };
 

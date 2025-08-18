@@ -46,7 +46,6 @@
                         <?php endif; ?>
                     </tbody>
                 </table>
-
             </div>
         </main>
     </div>

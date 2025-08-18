@@ -31,10 +31,12 @@
                                     || $orders['status_id'] == 9
                                     || $orders['status_id'] == 10
                                     || $orders['status_id'] == 11
+                                    || ($orders['status_id'] == 8 && $status['id'] == 11)
                                 ) {
                                     echo 'disabled';
                                 }
                                 ?>
+
                                 <?= $status['id'] == $orders['status_id'] ? 'selected' : '' ?>
                                 value="<?= $status['id']; ?>"><?= $status['name'] ?></option>
                         <?php endforeach; ?>
@@ -139,6 +141,7 @@
                 <tbody>
                     <?php
                     $total = 0;
+                    $ship = 50000; // phí ship cố định
                     foreach ($orderItems as $item):
                         $subtotal = $item['price'] * $item['quantity'];
                         $total += $subtotal;
@@ -149,12 +152,21 @@
                             <td><?= number_format($item['price']) ?>đ</td>
                             <td><?= $item['quantity'] ?></td>
                             <td><?= number_format($subtotal) ?>đ</td>
+                            <td></td>
                         </tr>
                     <?php endforeach; ?>
+
                     <tr>
-                        <td colspan="4" class="text-end"><strong>Tổng cộng:</strong></td>
-                        <td><strong><?= number_format($total) ?>đ</strong></td>
+                        <td colspan="4" align="right"><strong>Phí ship:</strong></td>
+                        <td><?= number_format($ship) ?>đ</td>
+                        <td></td>
                     </tr>
+                    <tr>
+                        <td colspan="4" align="right"><strong>Tổng cộng:</strong></td>
+                        <td><?= number_format($total + $ship) ?>đ</td>
+                        <td></td>
+                    </tr>
+
                 </tbody>
             </table>
 

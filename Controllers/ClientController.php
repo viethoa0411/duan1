@@ -22,6 +22,14 @@ class ClientController
     }
     public function index()
     {
+        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+
+        // Nếu có từ khóa thì gọi hàm tìm kiếm, ngược lại lấy toàn bộ sản phẩm
+        if (!empty($keyword)) {
+            $products = $this->productModel->searchProductsByName($keyword);
+        } else {
+            $products = $this->productModel->getAllProducts();
+        }
         $products = $this->productModel->getNewProducts();
         $products_view = $this->productModel->getTopView();
         require './views/clients/home.php';
@@ -74,9 +82,9 @@ class ClientController
         require './views/clients/search.php';
     }
 
-        public function userProfile()
+    public function userProfile()
     {
-        
+
         if (!isset($_SESSION['user_client'])) {
             header("Location: " . BASE_URL . "?act=login");
             exit();
@@ -85,7 +93,7 @@ class ClientController
         require './views/clients/profile.php';
     }
 
-        public function postUpdateProfile()
+    public function postUpdateProfile()
     {
         if (!isset($_SESSION['user_client'])) {
             header("Location: " . BASE_URL . "?act=login");
@@ -102,7 +110,7 @@ class ClientController
             $result = $this->userModel->updateUser($userId, $name, $email, $phone, $address);
 
             if ($result) {
-                
+
                 $_SESSION['user_client']['name'] = $name;
                 $_SESSION['user_client']['email'] = $email;
                 $_SESSION['user_client']['phone'] = $phone;
@@ -117,5 +125,16 @@ class ClientController
         exit();
     }
 
-    
+    public function listProducts()
+    {
+        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+
+        if (!empty($keyword)) {
+            $products = $this->productModel->searchProductsByName($keyword);
+        } else {
+            $products = $this->productModel->getAllProducts();
+        }
+
+        require './views/clients/product.php';
+    }
 }

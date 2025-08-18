@@ -91,8 +91,15 @@ class OrderController
                     $this->orderModel->decreaseStock($item['variant_id'], $item['quantity']);
                     $this->cartModel->remove($item['cart_id']);
                 }
+
+                // Xóa sản phẩm chọn trong session (nếu có)
                 unset($_SESSION['selected_products']);
+
+                // Cập nhật lại số lượng giỏ hàng
+                $_SESSION['cart_count'] = $this->cartModel->countCartItemsByUserId($userId);
+
                 $_SESSION['last_order_id'] = $orderId;
+
                 header("Location: " . BASE_URL . "?act=order-success");
                 exit;
             }
@@ -169,11 +176,48 @@ class OrderController
 
         if ($order && $order['user_id'] == $user_id) {
             if (in_array($order['status_id'], [1, 2, 3, 4, 5])) {
+
+                // ✅ 1. Lấy sản phẩm trong đơn
+                $orderItems = $this->orderModel->getOrderItems($id);
+
+                // ✅ 2. Cộng lại số lượng vào product_variants.stock
+                foreach ($orderItems as $item) {
+                    $this->orderModel->increaseStock($item['variant_id'], $item['quantity']);
+                }
+
+                // ✅ 3. Cập nhật trạng thái đơn
                 $this->orderModel->updateOrderStatus($id, 11);
+
                 header("Location: " . BASE_URL . "?act=history");
                 exit;
             } else {
-                echo "<script>alert('Đơn hàng này đã giao thành công. Bạn không thể hủy !!'); window.location.href='" . BASE_URL . "?act=history';</script>";
+                echo "<script>alert('Bạn không thể hủy đơn hàng này !!'); window.location.href='" . BASE_URL . "?act=history';</script>";
+            }
+        } else {
+            echo "<script>alert('Bạn không có quyền hủy đơn hàng này.'); window.location.href='" . BASE_URL . "?act=history';</script>";
+        }
+    }
+
+
+    public function refundOrder($id)
+    {
+        if (!isset($_SESSION['user_client'])) {
+            echo "<script>alert('Bạn chưa đăng nhập.'); window.history.back();</script>";
+            return;
+        }
+
+        $user = $_SESSION['user_client'];
+        $user_id = $user['id'];
+
+        $order = $this->orderModel->getOrderById($id);
+
+        if ($order && $order['user_id'] == $user_id) {
+            if (in_array($order['status_id'], [8])) {
+                $this->orderModel->updateOrderStatus($id, 10);
+                header("Location: " . BASE_URL . "?act=history");
+                exit;
+            } else {
+                echo "<script>alert('Bạn không thể hoàn đơn hàng này !!'); window.location.href='" . BASE_URL . "?act=history';</script>";
             }
         } else {
             echo "<script>alert('Bạn không có quyền hủy đơn hàng này.'); window.location.href='" . BASE_URL . "?act=history';</script>";
